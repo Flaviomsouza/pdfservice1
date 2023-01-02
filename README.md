@@ -1,11 +1,11 @@
 Gerador de PDF e PPTX da M Souza
 
 
-Linguagem: Python 3.8.14
-Framework: Flask
-Banco de Dados: MySQL
-Versão: 1.0
-Desenvolvedor: Caléb Rangel Porto - github.com/calebporto
+- Linguagem: Python 3.8.14
+- Framework: Flask
+- Banco de Dados: MySQL
+- Versão: 1.0
+- Desenvolvedor: Caléb Rangel Porto - github.com/calebporto
 
 
 
