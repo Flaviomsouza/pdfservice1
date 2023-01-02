@@ -1,0 +1,34 @@
+.linha-nome {
+    width: 40%;
+    margin: auto;
+}
+.visualizar-item {
+    width: 100%;
+}
+.label-item {
+    font-weight: bold;
+    margin-bottom: 0!important;
+}
+.input-edit {
+    padding: 3px;
+    margin-top: .5rem;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+form {
+    width: 100%;
+}
+.adicionar {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding: 5px;
+    padding-bottom: 2rem;
+    border-bottom: solid 1px gray;
+}
+.adicionar-bt {
+    width: 100%;
+    border: none;
+}
+.title {
+    padding: 5px 15px;
+}

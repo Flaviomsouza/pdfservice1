@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.top-navbar {
+    width: 100%;
+    height: 5rem;
+    padding: 10px 0px;
+    background: linear-gradient(black, rgb(31, 31, 31));
+}
+.top-navbar .container {
+    display: flex;
+    height: 100%;
+}
+.top-navbar-logo {
+    margin: auto;
+    width: 10%;
+    height: auto;
+}
+.top-navbar-title {
+    height: auto;
+    width: 80%;
+    margin: auto;
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    color: white;
+}
+.empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 10%;
+}
+.empty button {
+    width: 100%;
+    height: auto;
+}
+.voltar {
+    width: 60%;
+    margin: 1rem 0 1rem 0;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+.voltar a {
+    width: 100%;
+    text-decoration: none;
+}
+.voltar-bt {
+    width: 10%;
+    font-size: 15px;
+    text-align: center;
+    border-radius: 5px;
+    color: white;
+    box-shadow: 0px 3px 3px rgba(20, 20, 20, 0.2);
+    background: linear-gradient(black, rgb(31, 31, 31));
+}
+.menu-pt {
+    width: 60%;
+    border: solid 1px gray;
+    border-radius: 10px;
+    padding: 1rem;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2rem;
+    box-shadow: -3px 5px 5px rgba(20, 20, 20, 0.2);
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5rem;
+}
+.title-pt {
+    min-width: 50%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px;
+    background: linear-gradient(black, rgb(31, 31, 31));
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+.gold-bt {
+    background: linear-gradient(rgb(182, 182, 0),rgb(255, 255, 60));
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+    box-shadow: 0px 3px 3px rgba(20, 20, 20, 0.2);
+}
+.gold-bt:hover {
+    opacity: .95;
+    cursor: pointer;
+}
+.gold-bt:active {
+    position: relative;
+    box-shadow: 0px 0px 3px rgba(20, 20, 20, 0.2);
+    top: 3px;
+}
+.footer {
+    width: 100%;
+    background: linear-gradient(black, rgb(31, 31, 31));;
+    height: 7rem;
+    color: white;
+    text-align: center;
+    display: flex;
+}
+.footer p {
+    height: auto;
+    margin: auto;
+}
+.lista {
+    width: 100%;
+    padding: 5px;
+}
+.linha {
+    display: flex;
+    border-bottom: solid 1px gray;
+    padding: 3px 0;
+}
+.linha-bt {
+    width: 15%;
+    display: flex;
+    justify-content: end;
+    padding: 0 5px;
+}
+.linha-bt-bt {
+    width: 100%;
+}
+.linha-bt-bt:hover {
+    cursor: pointer!important;
+}

@@ -1,0 +1,74 @@
+.selecionar-nome {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    background-color: rgba(59, 0, 0, 0.055);
+    border-radius: 10px;
+}
+.label-nome {
+    font-weight: bold;
+    height: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+    width: 15%;
+    text-align: center;
+}
+.input-nome {
+    width: 85%;
+}
+.opcao {
+    margin-top: 2rem;
+    width: 100%;
+}
+.opcao-bt {
+    width: 100%;
+    font-weight: bold;
+    box-shadow: 0px 5px 5px rgba(20, 20, 20, 0.2);
+}
+.opcao-bt:active {
+    position: relative;
+    top: 3px;
+    box-shadow: 0px 2px 5px rgba(20, 20, 20, 0.2);
+}
+.info {
+    width: 100%;
+    margin-top: 2rem;
+}
+.input-section {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.055);
+    display: flex;
+}
+.input-file {
+    width: 50%;
+}
+.input-file p {
+    font-weight: bold;
+}
+.input-button {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    padding-left: 1rem;
+}
+.input-button button {
+    border: none;
+    width: 100%;
+    height: auto;
+    font-weight: bold;
+}
+.upload-nome {
+    display: flex;
+    padding: .5rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+.upload-nome p {
+    font-weight: bold;
+    width: 30%;
+}
+.upload-nome input {
+    width: 70%;
+}
