@@ -106,7 +106,7 @@ var atualizarLista = function() {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editarForm${element.id}" action="/pdf_service/painel-administrativo/colaboradores" method="post">
+                    <form id="editarForm${element.id}" action="/pdfservice/painel-administrativo/colaboradores" method="post">
                         <input type="hidden" name="tipo" value="editar">
                         <input type="hidden" name="id" value="${element.id}">
                         <div class="visualizar-item">
@@ -156,7 +156,7 @@ var atualizarLista = function() {
                     <h5 class="modal-title" id="exampleModalLabeleditar">Nova Senha - ${colaboradorNome}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="/pdf_service/painel-administrativo/colaboradores" method="POST">
+                <form action="/pdfservice/painel-administrativo/colaboradores" method="POST">
                     <input type="hidden" name="tipo" value="nova-senha">
                     <input type="hidden" name="id" value="${element.id}">
                     <div class="modal-body">
@@ -210,7 +210,7 @@ var atualizarLista = function() {
                 <div class="modal-body">
                 Após a exclusão, todo o cadastro de ${colaboradorNome} será apagado.
                 </div>
-                <form action="/pdf_service/painel-administrativo/colaboradores" method="POST">
+                <form action="/pdfservice/painel-administrativo/colaboradores" method="POST">
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <input type="hidden" name="tipo" value="excluir">
@@ -237,7 +237,7 @@ var carregarLista = function() {
         <span class="visually-hidden">Loading...</span>
     </div>
     `
-    fetch('/pdf_service/painel-administrativo/colaboradores?filter=all')
+    fetch('/pdfservice/painel-administrativo/colaboradores?filter=all')
     .then(function(response) {
         if (response.ok) {
             return response.json()

@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, make_response, render_template, redirect, request, url_for
+from flask import Blueprint, flash, make_response, render_template, redirect, request
 from app.providers.functions import allowed_file, image_id_generator, pdf_generator
 from app.models.basemodels import  User_For_View_, Worksheet_For_View_
 from pymysql.err import IntegrityError as IntegrityError2
@@ -15,11 +15,16 @@ import os
 admin_bp = Blueprint(
     'admin_bp',
     __name__,
-    url_prefix='/pdf_service'
+    url_prefix='/pdfservice'
 )
 
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    try:
+        if current_user.name:
+            return redirect('/pdfservice/painel-administrativo')
+    except:
+        pass
     if request.method == 'POST':
         email = request.form.get('email')
         senha = request.form.get('senha')
@@ -27,21 +32,21 @@ def login():
         user = User.query.filter(User.email == email).first()
         if not user:
             flash('Usuário Inválido')
-            return redirect('/pdf_service/login')
+            return redirect('/pdfservice/login')
         elif not check_password(senha, user.hash):
             flash('Senha Inválida')
-            return redirect('/pdf_service/login')
+            return redirect('/pdfservice/login')
         else:
             login_user(user, remember=True)
 
-        return redirect('/pdf_service/painel-administrativo')
+        return redirect('/pdfservice/painel-administrativo')
     else:
         return render_template('login.html')
 
 @admin_bp.route('/logout')
 def logout():
     logout_user()
-    return redirect('/pdf_service/login')
+    return redirect('/pdfservice/login')
 
 @admin_bp.route('/painel-administrativo', methods=['GET'])
 @login_required
@@ -56,7 +61,7 @@ def colaboradores():
             pass
         else:
             flash('Você não tem permissão para acessar esta página.')
-            return redirect('/pdf_service/painel-administrativo')
+            return redirect('/pdfservice/painel-administrativo')
         if request.method == 'POST':
             tipo = request.form.get('tipo')
             if tipo == 'editar':
@@ -106,7 +111,7 @@ def colaboradores():
                     flash('Colaborador adicionado com sucesso.')
             else:
                 flash('Erro na requisição. Tente novamente')
-            return redirect('/pdf_service/painel-administrativo/colaboradores')
+            return redirect('/pdfservice/painel-administrativo/colaboradores')
         else:
             if request.args.get('filter'):
                 filtro = request.args.get('filter')
@@ -130,16 +135,16 @@ def colaboradores():
             flash('Já existe cadastro para esse e-mail.')
         else:
             flash('Erro no servidor. Tente novamente.')
-        return redirect('/pdf_service/painel-administrativo/colaboradores')
+        return redirect('/pdfservice/painel-administrativo/colaboradores')
     except IntegrityError2 as error:
         if 'Duplicate entry' in str(error) and "for key 'users.email" in str(error):
             flash('Já existe cadastro para esse e-mail.')
         else:
             flash('Erro no servidor. Tente novamente.')
-        return redirect('/pdf_service/painel-administrativo/colaboradores')
+        return redirect('/pdfservice/painel-administrativo/colaboradores')
     except:
         flash('Erro no servidor. Tente novamente.')
-        return redirect('/pdf_service/painel-administrativo')
+        return redirect('/pdfservice/painel-administrativo')
 
 @admin_bp.route('/painel-administrativo/novo-catalogo', methods=['GET', 'POST'])
 @login_required
@@ -149,7 +154,7 @@ def novo_catalogo():
             nome = request.form.get('nome')
             if not nome:
                 flash('Você deve fornecer um nome para o novo catálogo.')
-                return redirect('/pdf_service/painel-administrativo/novo-catalogo')
+                return redirect('/pdfservice/painel-administrativo/novo-catalogo')
             arquivo = request.files.get('input-file')
             if not arquivo or arquivo.filename == '':
                 flash('Nenhum arquivo foi enviado.')
@@ -182,7 +187,7 @@ def novo_catalogo():
                     pdf = pdf_generator(content, image_id)
                     if pdf[0] == False:
                         flash(pdf[1])
-                        return redirect('/pdf_service/painel-administrativo/novo-catalogo')
+                        return redirect('/pdfservice/painel-administrativo/novo-catalogo')
 
                     nova_planilha = Worksheet_Content(
                         f'{nome} - {planilha}',
@@ -208,10 +213,10 @@ def novo_catalogo():
                     '''
                     flash(flash_text)
                     
-            return redirect('/pdf_service/painel-administrativo/novo-catalogo')
+            return redirect('/pdfservice/painel-administrativo/novo-catalogo')
         except Exception as error:
             flash('Erro no servidor. Tente novamente.')
-            return redirect('/pdf_service/painel-administrativo/novo-catalogo')
+            return redirect('/pdfservice/painel-administrativo/novo-catalogo')
 
     else:
         return render_template('novo-catalogo.html')
@@ -245,7 +250,7 @@ def lista_de_catalogos():
                 db.session.delete(catalogo)
             db.session.commit()
             flash('Cadastros antigos removidos com sucesso.')
-        return redirect('/pdf_service/painel-administrativo/lista-de-catalogos')
+        return redirect('/pdfservice/painel-administrativo/lista-de-catalogos')
     else:
         filtro = request.args.get('filter')
         if filtro:

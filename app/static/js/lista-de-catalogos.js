@@ -21,7 +21,7 @@ function carregarLista() {
         <span class="visually-hidden">Loading...</span>
     </div>
     `
-    let listaCatalogos = fetch('/pdf_service/painel-administrativo/lista-de-catalogos?filter=all')
+    let listaCatalogos = fetch('/pdfservice/painel-administrativo/lista-de-catalogos?filter=all')
     .then(function(response) {
         if (response.ok) {
             return response.json()
@@ -75,7 +75,7 @@ function atualizarLista() {
         visualizarBt.className = 'btn btn-sm btn-warning linha-bt-bt'
         visualizarBt.innerHTML = 'Abrir'
         visualizarBt.addEventListener('click', () => {
-            window.location.href = `/pdf_service/pdfview/${image_id}.pdf`
+            window.location.href = `/pdfservice/pdfview/${image_id}.pdf`
         })
         visualizar.appendChild(visualizarBt)
 
@@ -88,7 +88,7 @@ function atualizarLista() {
         baixarPDFBt.className = 'btn btn-sm btn-primary linha-bt-bt'
         baixarPDFBt.innerHTML = 'Baixar PDF'
         baixarPDFBt.addEventListener('click', () => {
-            window.location.href = `/pdf_service/painel-administrativo/lista-de-catalogos?filter=downloadpdf&arg=${image_id}.pdf`
+            window.location.href = `/pdfservice/painel-administrativo/lista-de-catalogos?filter=downloadpdf&arg=${image_id}.pdf`
         })
         baixarPDF.appendChild(baixarPDFBt)
         
@@ -101,7 +101,7 @@ function atualizarLista() {
         baixarPPTXBt.className = 'btn btn-sm btn-info linha-bt-bt'
         baixarPPTXBt.innerHTML = 'Baixar PPTX'
         baixarPPTXBt.addEventListener('click', () => {
-            window.location.href = `/pdf_service/painel-administrativo/lista-de-catalogos?filter=downloadpptx&arg=${image_id}.pptx`
+            window.location.href = `/pdfservice/painel-administrativo/lista-de-catalogos?filter=downloadpptx&arg=${image_id}.pptx`
         })
         baixarPPTX.appendChild(baixarPPTXBt)
         
@@ -135,7 +135,7 @@ function atualizarLista() {
                 <div class="modal-body">
                 Após a exclusão, todo o cadastro de ${nome.innerHTML} será apagado.
                 </div>
-                <form action="/pdf_service/painel-administrativo/lista-de-catalogos" method="POST">
+                <form action="/pdfservice/painel-administrativo/lista-de-catalogos" method="POST">
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <input type="hidden" name="tipo" value="excluir">

@@ -35,7 +35,7 @@ uploadOption.addEventListener('click', () => {
 
         let formFile = document.createElement('form')
         formFile.method = 'POST'
-        formFile.action = '/pdf_service/painel-administrativo/novo-catalogo'
+        formFile.action = '/pdfservice/painel-administrativo/novo-catalogo'
         formFile.enctype = "multipart/form-data"
 
         let inputSection = document.createElement('div')

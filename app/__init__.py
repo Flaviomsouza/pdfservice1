@@ -3,8 +3,9 @@ from flask_login import LoginManager
 from datetime import timedelta
 from dotenv import load_dotenv
 from flask import Flask
-load_dotenv()
 import os
+from app.providers.hash_provider import check_password
+load_dotenv()
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -18,16 +19,17 @@ app.config['REMEMBER_COOKIE_DURATION'] = timedelta(weeks=1)
 app.config['REMEMBER_COOKIE_REFRESH_EACH_REQUEST'] = True
 
 
-login_manager.login_view = "/pdf_service/login"  # Definindo a página de redirecionamento caso o usuário não esteja logado através de login_required
+login_manager.login_view = "/pdfservice/login"  # Definindo a página de redirecionamento caso o usuário não esteja logado através de login_required
 login_manager.login_message = 'Você deve estar logado para acessar esta página.'
+
+
+from .models import tables
+
+from app.views.admin import admin_bp
+app.register_blueprint(admin_bp)
 
 db.init_app(app)
 login_manager.init_app(app)
 
-from .models import tables
-
 with app.app_context():
     db.create_all()
-
-from app.views.admin import admin_bp
-app.register_blueprint(admin_bp)
