@@ -206,10 +206,7 @@ def novo_catalogo():
                         flash_text = texto
                     flash_text = f'''
                     {flash_text} .
-                    Motivo: Ausência de alguma coluna obrigatória ("Endereço ou "Foto")'
-
-                    Obs: Sua planilha deve conter obrigatoriamente uma coluna chamada "Endereço" e
-                    outra chamada "Foto", para criação do PDF.
+                    Motivo: 'A coluna da foto não foi reconhecida. A planilha deve fornecer uma coluna de nome "Foto", "Imagem", "Image", "Picture", "Photo", "Imagen" ou "Fotografia".'
                     '''
                     flash(flash_text)
                     
