@@ -85,7 +85,7 @@ function atualizarLista() {
 
         let baixarPDFBt = document.createElement('button')
         baixarPDFBt.type = 'button'
-        baixarPDFBt.className = 'btn btn-sm btn-primary linha-bt-bt'
+        baixarPDFBt.className = 'btn btn-sm btn-danger linha-bt-bt'
         baixarPDFBt.innerHTML = 'Baixar PDF'
         baixarPDFBt.addEventListener('click', () => {
             window.location.href = `/pdfservice/painel-administrativo/lista-de-books?filter=downloadpdf&arg=${image_id}.pdf`
@@ -98,12 +98,51 @@ function atualizarLista() {
 
         let baixarPPTXBt = document.createElement('button')
         baixarPPTXBt.type = 'button'
-        baixarPPTXBt.className = 'btn btn-sm btn-info linha-bt-bt'
+        baixarPPTXBt.className = 'btn btn-sm btn-danger linha-bt-bt'
         baixarPPTXBt.innerHTML = 'Baixar PPTX'
         baixarPPTXBt.addEventListener('click', () => {
             window.location.href = `/pdfservice/painel-administrativo/lista-de-books?filter=downloadpptx&arg=${image_id}.pptx`
         })
         baixarPPTX.appendChild(baixarPPTXBt)
+
+        //Botão Gerar Novamente
+        let gerarNovamente = document.createElement('div')
+        gerarNovamente.className = 'linha-bt gerar-novamente'
+
+        let gerarNovamenteBt = document.createElement('button')
+        gerarNovamenteBt.type = 'button'
+        gerarNovamenteBt.className = 'btn btn-sm btn-dark linha-bt-bt gerar-novamente-bt'
+        gerarNovamenteBt.innerHTML = 'Gerar Novamente'
+        gerarNovamenteBt.addEventListener('click', () => {
+            $('#staticBackdrop').modal('show')
+            window.location.href = `/pdfservice/painel-administrativo/lista-de-books?filter=gerarNovamente&arg=${element.id}`
+        })
+        gerarNovamente.appendChild(gerarNovamenteBt)
+
+        let modalGerarNovamente = document.createElement('div')
+        modalGerarNovamente.className = 'modal fade'
+        modalGerarNovamente.id = 'staticBackdrop'
+        modalGerarNovamente.setAttribute('data-bs-backdrop', 'static')
+        modalGerarNovamente.setAttribute('data-bs-keyboard', 'false')
+        modalGerarNovamente.tabIndex = '-1'
+        modalGerarNovamente.setAttribute('aria-labelledby', 'staticBackdropLabel')
+        modalGerarNovamente.ariaHidden = true
+        modalGerarNovamente.innerHTML = `
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Aguarde...</h5>
+                </div>
+                <div class="modal-body">
+                    Fazendo o download das imagens e gerando os links e os documentos PDF e PPTX. Isso pode levar alguns minutos.
+                    <div class="spinner-border text-warning" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `
+        gerarNovamente.appendChild(modalGerarNovamente)
         
         // Botão Excluir
         let excluir = document.createElement('div')
@@ -153,6 +192,7 @@ function atualizarLista() {
         linha.appendChild(visualizar)
         linha.appendChild(baixarPDF)
         linha.appendChild(baixarPPTX)
+        linha.appendChild(gerarNovamente)
         linha.appendChild(excluir)
         lista.appendChild(linha)
     })

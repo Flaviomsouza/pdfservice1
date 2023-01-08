@@ -8,7 +8,7 @@ msg = email.message.Message()
 msg['Subject'] = 'TESTE CRONJOB'
 msg['From'] = 'calebbds@gmail.com'
 msg['To'] = 'calebporto@hotmail.com'
-password = 'kpxrnsqdsvrtvnka'
+password = 'qfhrpmbdbbmyrlna'
 msg.add_header('Content-Type', 'text/html')
 msg.set_payload(email_body)
 
