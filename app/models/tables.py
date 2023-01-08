@@ -1,6 +1,5 @@
-from app import db, login_manager, app
+from app import db, login_manager
 from flask_login import UserMixin
-from werkzeug.security import generate_password_hash
 
 @login_manager.user_loader
 def get_user(user_id):
@@ -27,12 +26,16 @@ class Worksheet_Content(db.Model):
     __tablename__ = 'worksheet_content'
     id = db.Column(db.Integer, autoincrement=True, primary_key=True, nullable=False)
     title = db.Column(db.String(255), nullable=False)
+    company = db.Column(db.String(255))
+    person = db.Column(db.String(255))
     content = db.Column(db.JSON, nullable=False)
     creation_date = db.Column(db.Date, nullable=False)
     image_id = db.Column(db.String(255), nullable=False, unique=True)
 
-    def __init__(self, title, content, creation_date, image_id):
+    def __init__(self, title, company, person, content, creation_date, image_id):
         self.title = title
+        self.company = company
+        self.person = person
         self.content = content
         self.creation_date = creation_date
         self.image_id = image_id

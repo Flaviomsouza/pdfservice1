@@ -146,123 +146,140 @@ def colaboradores():
         flash('Erro no servidor. Tente novamente.')
         return redirect('/pdfservice/painel-administrativo')
 
-@admin_bp.route('/painel-administrativo/novo-catalogo', methods=['GET', 'POST'])
+@admin_bp.route('/painel-administrativo/novo-book', methods=['GET', 'POST'])
 @login_required
-def novo_catalogo():
+def novo_book():
     if request.method == 'POST':
-        try:
-            nome = request.form.get('nome')
-            if not nome:
-                flash('Você deve fornecer um nome para o novo catálogo.')
-                return redirect('/pdfservice/painel-administrativo/novo-catalogo')
-            arquivo = request.files.get('input-file')
-            if not arquivo or arquivo.filename == '':
-                flash('Nenhum arquivo foi enviado.')
-            elif not allowed_file(arquivo.filename):
-                flash('Formato de arquivo não suportado. Você deve enviar arquivos ".xlsx" ou ".xls"')
-            else:
-                tabela = pd.ExcelFile(arquivo)
-                planilhas = tabela.sheet_names # Pega o nome de todas as abas da tabela
-                planilhas_não_convertidas = []
-                for planilha in planilhas:
-                    colunas = list(pd.read_excel(arquivo, sheet_name=planilha).columns)
-                    # Verifica se as colunas Endereço e Foto estão presentes
-                    endereco_check = False
-                    foto_check = False
-                    for i, coluna in enumerate(colunas):
-                        if 'endereço' in coluna.lower() or 'endereco' in coluna.lower() or 'direccion' in coluna.lower() or 'dirección' in coluna.lower() or 'address' in coluna.lower():
-                            endereco_check = True
-                        elif 'foto' in coluna.lower() or 'imagem' in coluna.lower() or 'imagen' in coluna.lower() or 'fotografia' in coluna.lower() or 'fotografía' in coluna.lower() or 'image' in coluna.lower() or 'picture' in coluna.lower():
-                            foto_check = True
-                        colunas[i] = coluna
-                    if endereco_check == False or foto_check == False:
-                        planilhas_não_convertidas.append(planilha)
-                        continue
-                    
-                    catalogo = pd.read_excel(arquivo, sheet_name=planilha).to_dict('records')
-                    image_id = image_id_generator()
-                    content = {'colunas': colunas, 'conteudo': catalogo}
-                    
-                    # Gerando PDF
-                    pdf = pdf_generator(content, image_id)
-                    if pdf[0] == False:
-                        flash(pdf[1])
-                        return redirect('/pdfservice/painel-administrativo/novo-catalogo')
+        #try:
+        nome = request.form.get('nome')
+        cliente = request.form.get('cliente') if request.form.get('cliente') else None
+        pessoa = request.form.get('pessoa') if request.form.get('pessoa') else None
+        if not nome:
+            flash('Você deve fornecer um nome para o novo book.')
+            return redirect('/pdfservice/painel-administrativo/novo-book')
+        arquivo = request.files.get('input-file')
+        if not arquivo or arquivo.filename == '':
+            flash('Nenhum arquivo foi enviado.')
+        elif not allowed_file(arquivo.filename):
+            flash('Formato de arquivo não suportado. Você deve enviar arquivos ".xlsx" ou ".xls"')
+        else:
+            tabela = pd.ExcelFile(arquivo)
+            planilhas = tabela.sheet_names # Pega o nome de todas as abas da tabela
+            planilhas_não_convertidas = []
+            for planilha in planilhas:
+                colunas = list(pd.read_excel(arquivo, sheet_name=planilha).columns)
+                # Verifica se as colunas Endereço e Foto estão presentes
+                endereco_check = False
+                foto_check = False
+                latitude_check = False
+                longitude_check = False
+                codigo_check = False
+                for i, coluna in enumerate(colunas):
+                    if 'endereço' in coluna.lower() or 'endereco' in coluna.lower() or 'direccion' in coluna.lower() or 'dirección' in coluna.lower() or 'address' in coluna.lower():
+                        endereco_check = True
+                    elif 'foto' in coluna.lower() or 'imagem' in coluna.lower() or 'imagen' in coluna.lower() or 'fotografia' in coluna.lower() or 'fotografía' in coluna.lower() or 'image' in coluna.lower() or 'picture' in coluna.lower() or 'photo' in coluna.lower():
+                        foto_check = True
+                    elif 'latitude' in coluna.lower() or 'latitud' in coluna.lower():
+                        latitude_check = True
+                    elif 'longitude' in coluna.lower() or 'longitud' in coluna.lower():
+                        longitude_check = True
+                    elif 'codigo' in coluna.lower() or 'código' in coluna.lower() or 'cod' in coluna.lower() or 'cód' in coluna.lower() or 'code' in coluna.lower():
+                        codigo_check = True
+                    colunas[i] = coluna
+                if not foto_check or not endereco_check or not latitude_check or not longitude_check or not codigo_check:
+                    planilhas_não_convertidas.append(planilha)
+                    continue
+                
+                book = pd.read_excel(arquivo, sheet_name=planilha).to_dict('records')
+                image_id = image_id_generator()
+                capa = {'nome': nome, 'cliente': cliente, 'pessoa': pessoa}
+                content = {'colunas': colunas, 'conteudo': book}
+                
+                # Gerando PDF
+                pdf = pdf_generator(capa, content, image_id)
+                if pdf[0] == False:
+                    flash(pdf[1])
+                    return redirect('/pdfservice/painel-administrativo/novo-book')
 
-                    nova_planilha = Worksheet_Content(
-                        f'{nome} - {planilha}',
-                        dumps(content),
-                        date.today(),
-                        image_id
-                    )
-                    db.session.add(nova_planilha)
-                    db.session.commit()
-                    flash(f'Planilha {nome} - {planilha} gerada com sucesso.')
+                nova_planilha = Worksheet_Content(
+                    nome.title(),
+                    cliente,
+                    pessoa,
+                    dumps(content),
+                    date.today(),
+                    image_id
+                )
+                db.session.add(nova_planilha)
+                db.session.commit()
+                flash(f'Planilha {nome.title()} gerada com sucesso.')
 
-                if len(planilhas_não_convertidas) > 0:
-                    flash_text = 'As seguintes planilhas não puderam ser convertidas: '
-                    for item in planilhas_não_convertidas:
-                        texto = flash_text + f'{item}, '
-                        flash_text = texto
-                    flash_text = f'''
-                    {flash_text} .
-                    Motivo: 'A coluna da foto não foi reconhecida. A planilha deve fornecer uma coluna de nome "Foto", "Imagem", "Image", "Picture", "Photo", "Imagen" ou "Fotografia".'
-                    '''
-                    flash(flash_text)
-                    
-            return redirect('/pdfservice/painel-administrativo/novo-catalogo')
-        except Exception as error:
+            if len(planilhas_não_convertidas) > 0:
+                flash_text = 'As seguintes planilhas não puderam ser convertidas: '
+                for item in planilhas_não_convertidas:
+                    texto = flash_text + f'{item}, '
+                    flash_text = texto
+                flash_text = f'''
+                {flash_text} .
+                Motivo: Alguma coluna obrigatória não foi reconhecida.
+                As colunas obrigatórias são código, endereço, foto, latitude e longitude.
+                Esses termos em espanhol e em inglês também são aceitos.
+                '''
+                flash(flash_text)
+                
+        return redirect('/pdfservice/painel-administrativo/novo-book')
+        '''except Exception as error:
             flash('Erro no servidor. Tente novamente.')
-            return redirect('/pdfservice/painel-administrativo/novo-catalogo')
+            return redirect('/pdfservice/painel-administrativo/novo-book')
+            '''
 
     else:
-        return render_template('novo-catalogo.html')
+        return render_template('novo-book.html')
 
-@admin_bp.route('/painel-administrativo/lista-de-catalogos', methods=['GET', 'POST'])
+@admin_bp.route('/painel-administrativo/lista-de-books', methods=['GET', 'POST'])
 @login_required
-def lista_de_catalogos():
+def lista_de_books():
     if request.method == 'POST':
         if request.form.get('tipo') == 'excluir':
             id = request.form.get('id')
-            catalogo = Worksheet_Content.query.filter(Worksheet_Content.id == id).first()
-            catalogo_pdf = f'app/static/media/pdf/{catalogo.image_id}.pdf'
-            catalogo_pptx = f'app/static/media/pptx/{catalogo.image_id}.pptx'
-            if os.path.exists(catalogo_pdf):
-                os.remove(catalogo_pdf)
-            if os.path.exists(catalogo_pptx):
-                os.remove(catalogo_pptx)
-            db.session.delete(catalogo)
+            book = Worksheet_Content.query.filter(Worksheet_Content.id == id).first()
+            book_pdf = f'app/static/media/pdf/{book.image_id}.pdf'
+            book_pptx = f'app/static/media/pptx/{book.image_id}.pptx'
+            if os.path.exists(book_pdf):
+                os.remove(book_pdf)
+            if os.path.exists(book_pptx):
+                os.remove(book_pptx)
+            db.session.delete(book)
             db.session.commit()
-            flash('Catálogo removido com sucesso.')
+            flash('Book removido com sucesso.')
         elif request.form.get('tipo') == 'remover-antigos':
             data_limite = date.today() - timedelta(days=60)
-            catalogos = Worksheet_Content.query.filter(Worksheet_Content.creation_date < data_limite).all()
-            for catalogo in catalogos:
-                catalogo_pdf = f'app/static/media/pdf/{catalogo.image_id}.pdf'
-                catalogo_pptx = f'app/static/media/pptx/{catalogo.image_id}.pptx'
-                if os.path.exists(catalogo_pdf):
-                    os.remove(catalogo_pdf)
-                if os.path.exists(catalogo_pptx):
-                    os.remove(catalogo_pptx)
-                db.session.delete(catalogo)
+            books = Worksheet_Content.query.filter(Worksheet_Content.creation_date < data_limite).all()
+            for book in books:
+                book_pdf = f'app/static/media/pdf/{book.image_id}.pdf'
+                book_pptx = f'app/static/media/pptx/{book.image_id}.pptx'
+                if os.path.exists(book_pdf):
+                    os.remove(book_pdf)
+                if os.path.exists(book_pptx):
+                    os.remove(book_pptx)
+                db.session.delete(book)
             db.session.commit()
             flash('Cadastros antigos removidos com sucesso.')
-        return redirect('/pdfservice/painel-administrativo/lista-de-catalogos')
+        return redirect('/pdfservice/painel-administrativo/lista-de-books')
     else:
         filtro = request.args.get('filter')
         if filtro:
             if filtro == 'all':
-                catalogos_db = Worksheet_Content.query.all()
-                for i, item in enumerate(catalogos_db):
-                    catalogo = Worksheet_For_View_(
+                books_db = Worksheet_Content.query.all()
+                for i, item in enumerate(books_db):
+                    book = Worksheet_For_View_(
                         id=item.id,
                         title=item.title,
                         creation_date=item.creation_date,
                         image_id=item.image_id
                     )
-                    catalogos_db[i] = catalogo.dict()
-                catalogos = sorted(catalogos_db, key=lambda row:row['creation_date'], reverse=True)
-                return dumps(catalogos, default=str)
+                    books_db[i] = book.dict()
+                books = sorted(books_db, key=lambda row:row['creation_date'], reverse=True)
+                return dumps(books, default=str)
             elif filtro == 'downloadpdf':
                 arquivo = request.args.get('arg')
                 with open(f'app/static/media/pdf/{arquivo}', 'rb') as f: 
@@ -274,7 +291,7 @@ def lista_de_catalogos():
                     dados = f.read()
                 return make_response(dados, {'content-type': 'application/vnd.openxmlformats-officedocument.presentationml.presentation'})
 
-        return render_template('lista-de-catalogos.html')
+        return render_template('lista-de-books.html')
 
 @admin_bp.route('/pdfview/<pdf_file>')
 def pdfview(pdf_file):

@@ -6,7 +6,7 @@ export class Colaborador {
         this.password = password;
     }
 }
-export class Catalogo {
+export class Book {
     constructor(id, title, content, creation_date, image_id) {
         this.id = id;
         this.title = title;

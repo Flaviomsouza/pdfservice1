@@ -1,10 +1,10 @@
-let novoCatalogo = document.querySelector('#novo-catalogo')
+let novoCatalogo = document.querySelector('#novo-book')
 novoCatalogo.addEventListener('click', () => {
-    window.location.href = '/pdfservice/painel-administrativo/novo-catalogo'
+    window.location.href = '/pdfservice/painel-administrativo/novo-book'
 })
-let listaDeCatalogos = document.querySelector('#lista-de-catalogos')
+let listaDeCatalogos = document.querySelector('#lista-de-books')
 listaDeCatalogos.addEventListener('click', () => {
-    window.location.href = '/pdfservice/painel-administrativo/lista-de-catalogos'
+    window.location.href = '/pdfservice/painel-administrativo/lista-de-books'
 })
 let colaboradores = document.querySelector('#colaboradores')
 colaboradores.addEventListener('click', () => {

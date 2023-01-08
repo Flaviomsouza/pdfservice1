@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/patterns.css">
+    <link rel="stylesheet" href="/static/css/lista-de-books.css">
+    <title>Lista de Books - M Souza</title>
+</head>
+<body>
+    <div class="top-navbar">
+        <div class="container">
+            <img class="top-navbar-logo" src="/static/media/logo.png" alt="m souza logotipo">
+            <p class="top-navbar-title">Painel Administrativo</p>
+            <div class="empty">
+                <a href="/pdfservice/logout"><button class="btn btn-light">Sair</button></a>
+            </div>
+        </div>
+    </div>
+    <div class="voltar">
+        <a href="/pdfservice/painel-administrativo">
+            <button class="voltar-bt"> ⇦  Voltar</button>
+        </a>
+    </div>
+    <div class="menu-pt" id="menu">
+        {% set messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        <div class="title-pt title">Lista de Books</div>
+        <div class="remover-antigos">
+            <a class="rm-items right" href="/pdfservice/painel-administrativo/novo-book">
+                <button class="btn btn-warning">Adicionar</button>
+            </a>
+        </div>
+        <div class="lista" id="lista">
+        </div>
+    </div>
+    <script type="text/javascript" src="/static/js/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="/static/js/classes.js"></script>
+    <script type="module" src="/static/js/lista-de-books.js"></script>
+</body>
+</html>
