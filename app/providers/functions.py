@@ -4,12 +4,51 @@ from reportlab.lib.pagesizes import A4, landscape, mm
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from secrets import token_urlsafe
-from app.models.tables import Worksheet_Content
+from app.models.tables import Worksheet_Content as Worksheet_Flask
 from pptx import Presentation
 from pptx.util import Mm
 from pptx.enum.text import PP_PARAGRAPH_ALIGNMENT
 from pptx.dml.color import RGBColor
 from PIL import UnidentifiedImageError
+from app import db
+from flask import flash
+from json import loads, dumps
+from sqlalchemy import Column, Date, Integer, String, create_engine, select
+from sqlalchemy.orm import declarative_base, Session
+from datetime import date, timedelta
+from sqlalchemy.dialects.mysql import JSON
+from dotenv import load_dotenv
+from app import app
+load_dotenv()
+import os
+
+'''
+Função para gerar 
+'''
+
+
+Base = declarative_base()
+
+class Worksheet_Content(Base):
+    __tablename__ = 'worksheet_content'
+    id = Column(Integer, autoincrement=True, primary_key=True, nullable=False)
+    title = Column(String(255), nullable=False)
+    company = Column(String(255))
+    person = Column(String(255))
+    content = Column(JSON, nullable=False)
+    creation_date = Column(Date, nullable=False)
+    image_id = Column(String(255), nullable=False, unique=True)
+
+    def __init__(self, title, company, person, content, creation_date, image_id):
+        self.title = title
+        self.company = company
+        self.person = person
+        self.content = content
+        self.creation_date = creation_date
+        self.image_id = image_id
+
+engine = create_engine(os.environ['SQLALCHEMY_DATABASE_URI'], echo=True, future=True)
+session = Session(engine)
 
 
 ALLOWED_EXTENSIONS = {'xlsx', 'xls'}
@@ -19,12 +58,12 @@ def allowed_file(filename):
 
 def image_id_generator():
     image_id = token_urlsafe(40)
-    image_id_db = Worksheet_Content.query.filter(Worksheet_Content.image_id == image_id).first()
+    image_id_db = Worksheet_Flask.query.filter(Worksheet_Flask.image_id == image_id).first()
     if image_id_db:
         image_id_generator()
     return image_id
 
-def pdf_generator(capa, content, image_id):
+def pdf_generator(capa, content, image_id, is_worker):
     try:
         colunas = content['colunas']
         linhas = content['conteudo']
@@ -352,11 +391,26 @@ def pdf_generator(capa, content, image_id):
             pdf.showPage()
         pdf.save()
         apresentacao.save(f'app/static/media/pptx/{image_id}.pptx')
-        return True, 'Arquivos PDF e PPTX gerados com sucesso.'
+        
+        if is_worker == True:
+            session.add(Worksheet_Content(
+                capa['nome'].title(),
+                capa['cliente'],
+                capa['pessoa'],
+                dumps(content),
+                date.today(),
+                image_id
+            ))
+            session.commit()
+        message = f'Book {capa["nome"].title()} cadastrado e seus arquivos PDF e PPTX gerados com sucesso.'
+        send_message = requests.get(f'{os.environ["APP_URL"]}/pdfservice/flash-message-generate?message={message}', headers={'Secret-Key': os.environ['SECRET_KEY']})
+            
     except UnidentifiedImageError as error:
         print(str(error))
-        return False, 'A planilha contém imagem com formato inválido. Você deve fornecer um link de imagem .jpg, .jpeg ou .png. Telas de Google Maps ou Street View não são aceitas.'
+        message = f'Falha ao gerar o Book {capa["nome"]}. Motivo: Link de imagem inválido. Você deve fornecer um link de imagem .jpg, .jpeg ou .png. Links de telas de Google Maps ou Street View não são aceitas.'
+        send_message = requests.get(f'{os.environ["APP_URL"]}/pdfservice/flash-message-generate?message={message}', headers={'Secret-Key': os.environ['SECRET_KEY']})
     except Exception as error:
         print(str(error))
-        return False, 'Erro no servidor. Tente novamente.'
+        message = f'Falha ao gerar o Boook {capa["nome"]}. Motivo: Erro no servidor.'
+        send_message = requests.get(f'{os.environ["APP_URL"]}/pdfservice/flash-message-generate?message={message}', headers={'Secret-Key': os.environ['SECRET_KEY']})
     

@@ -46,5 +46,5 @@ for item in result:
     capa = {'nome': item.title, 'cliente': item.company, 'pessoa': item.person}
     if not os.path.exists(book_pdf) or not os.path.exists(book_pptx):
         print(f'{datetime.datetime.now()} - Gerando PDF e PPTX para o book {item.title}')
-        generator = pdf_generator(capa, loads(item.content), item.image_id)
+        generator = pdf_generator(capa, loads(item.content), item.image_id, False)
         print(f'{datetime.datetime.now()} - {generator}')

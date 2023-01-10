@@ -1,5 +1,4 @@
-from flask import Blueprint, flash, make_response, render_template, redirect, request
-from app.providers.functions import allowed_file, image_id_generator, pdf_generator
+from flask import Blueprint, flash, make_response, render_template, redirect, request, Response, get_flashed_messages
 from app.models.basemodels import  User_For_View_, Worksheet_For_View_
 from pymysql.err import IntegrityError as IntegrityError2
 from app.providers.hash_provider import check_password, hash_generate
@@ -10,7 +9,13 @@ from flask_login import current_user, login_required, login_user, logout_user
 from json import dumps, loads
 import pandas as pd
 from app import db
+from app.providers.functions import allowed_file, image_id_generator, pdf_generator
 import os
+from rq import Queue
+from worker import conn
+import redis
+
+redis_db = redis.Redis(decode_responses=True)
 
 admin_bp = Blueprint(
     'admin_bp',
@@ -195,23 +200,12 @@ def novo_book():
                     capa = {'nome': nome, 'cliente': cliente, 'pessoa': pessoa}
                     content = {'colunas': colunas, 'conteudo': book}
                     
+                    # Criando fila rq
+                    q = Queue(connection=conn)
                     # Gerando PDF
-                    pdf = pdf_generator(capa, content, image_id)
-                    if pdf[0] == False:
-                        flash(pdf[1])
-                        return redirect('/pdfservice/painel-administrativo/novo-book')
-
-                    nova_planilha = Worksheet_Content(
-                        nome.title(),
-                        cliente,
-                        pessoa,
-                        dumps(content),
-                        date.today(),
-                        image_id
-                    )
-                    db.session.add(nova_planilha)
-                    db.session.commit()
-                    flash(f'Planilha {nome.title()} gerada com sucesso.')
+                    # pdf = pdf_generator(capa, content, image_id)
+                    result = q.enqueue(pdf_generator, capa, content, image_id, True, job_timeout='30m')
+                    flash(f'O book {nome.title()} está sendo gerado. Quando estiver concluído, ele aparecerá em "Lista de Books" ou notificará na tela em caso de erro.')
 
                 if len(planilhas_não_convertidas) > 0:
                     flash_text = 'As seguintes planilhas não puderam ser convertidas: '
@@ -266,6 +260,13 @@ def lista_de_books():
                 flash('Cadastros antigos removidos com sucesso.')
             return redirect('/pdfservice/painel-administrativo/lista-de-books')
         else:
+            messages = redis_db.get('messages')
+            if messages:
+                message_list = messages.split('&')
+                for message in message_list:
+                    if len(message) > 2:
+                        flash(message)
+                redis_db.delete('messages')
             filtro = request.args.get('filter')
             if filtro:
                 if filtro == 'all':
@@ -317,7 +318,7 @@ def lista_de_books():
                         return redirect('/pdfservice/painel-administrativo/lista-de-books')
                     else:
                         flash(pdf[1])
-
+            
             return render_template('lista-de-books.html')
     except Exception as error:
         print(str(error))
@@ -334,3 +335,12 @@ def pdfview(pdf_file):
         return 'Link inexistente. Contate o servidor. (Erro: Arquivo não encontrado)'
     except:
         return 'Erro no servidor. Estamos trabalhando para corrigir.'
+
+@admin_bp.route('/flash-message-generate')
+def flash_message_generate():
+    chave = request.headers.get('Secret-Key')
+    message = request.args.get('message')
+    if chave == os.environ['SECRET_KEY']:
+        redis_db.append('messages', f'{message}&')
+        return Response(status=200, response='OK')
+    return dumps(False)
