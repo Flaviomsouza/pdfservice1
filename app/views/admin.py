@@ -15,7 +15,7 @@ from rq import Queue
 from worker import conn
 import redis
 
-redis_db = redis.Redis(decode_responses=True, host=os.environ['REDIS_URL'], port=15022)
+redis_db = redis.Redis(decode_responses=True, host=os.environ['REDIS_HOST'], username=os.environ['REDIS_USERNAME'], password=os.environ['REDIS_PASSWORD'], port=15022)
 
 admin_bp = Blueprint(
     'admin_bp',
