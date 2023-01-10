@@ -312,12 +312,11 @@ def lista_de_books():
                     capa = {'nome':book.title, 'cliente':book.company, 'pessoa':book.person}
                     content = loads(book.content)
                     image_id = book.image_id
-                    pdf = pdf_generator(capa, content, image_id)
-                    if pdf[0] == False:
-                        flash(pdf[1])
-                        return redirect('/pdfservice/painel-administrativo/lista-de-books')
-                    else:
-                        flash(pdf[1])
+                    # Criando fila rq
+                    q = Queue(connection=conn)
+                    # Gerando PDF
+                    result = q.enqueue(pdf_generator, capa, content, image_id, False, job_timeout='30m')
+                    flash(f'O book {(book.title).title()} está sendo gerado. Quando estiver concluído, ele aparecerá em "Lista de Books" ou notificará na tela em caso de erro.')
             
             return render_template('lista-de-books.html')
     except Exception as error:
